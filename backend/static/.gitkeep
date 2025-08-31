@@ -1,0 +1,2 @@
+# This file ensures the static directory is tracked by git
+# Flask static files can be added here if needed

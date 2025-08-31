@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Assignment - Deadline Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Add New Assignment</h1>
+            <a href="index.html" class="btn btn-secondary">Back to List</a>
+        </header>
+        
+        <main>
+            <form id="add-assignment-form" class="form">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title">
+                    <div class="error-message" id="title-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                    <div class="error-message" id="description-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="due-date">Due Date</label>
+                    <input type="datetime-local" id="due-date" name="due_date">
+                    <div class="error-message" id="due-date-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority">
+                        <option value="">Select Priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <div class="error-message" id="priority-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="">Select Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <div class="error-message" id="status-error"></div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Assignment</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Cancel</button>
+                </div>
+            </form>
+        </main>
+    </div>
+    
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+    
+    <script src="js/add.js"></script>
+</body>
+</html>
