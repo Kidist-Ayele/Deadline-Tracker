@@ -1,5 +1,5 @@
 // Authentication JavaScript
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = 'https://deadline-tracker-1-ijdo.onrender.com/api';
 
 // DOM Elements
 const loginForm = document.getElementById('login-form');

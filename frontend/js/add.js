@@ -1,5 +1,5 @@
 // API base URL - adjust this to match your Flask backend
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = 'https://deadline-tracker-1-ijdo.onrender.com/api';
 
 // DOM elements
 const addForm = document.getElementById('add-assignment-form');
