@@ -1,5 +1,5 @@
 // API base URL - adjust this to match your Flask backend
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
 // DOM elements
 const addForm = document.getElementById('add-assignment-form');
@@ -23,13 +23,27 @@ async function handleFormSubmit(event) {
     event.preventDefault();
     
     const formData = new FormData(addForm);
+    
+    // Get the due date from the input element to ensure proper format
+    const dueDateInput = document.getElementById('due-date');
+    const dueDateValue = dueDateInput.value; // This gives us the proper YYYY-MM-DDTHH:MM format
+    
+    // Use the exact date/time entered by the user (no timezone conversion)
+    let dueDateToSend = dueDateValue;
+    if (dueDateValue) {
+        // Convert to the format expected by the server (YYYY-MM-DD HH:MM:SS)
+        dueDateToSend = dueDateValue.replace('T', ' ');
+    }
+    
     const assignmentData = {
         title: formData.get('title'),
         description: formData.get('description'),
-        due_date: formData.get('due_date'),
+        due_date: dueDateToSend, // Send EAT date to server
         priority: formData.get('priority'),
         status: formData.get('status')
     };
+    
+
     
     // Clear all previous error messages
     clearAllErrors();
@@ -54,11 +68,12 @@ async function handleFormSubmit(event) {
         if (!hasErrors) document.getElementById('due-date').focus();
         hasErrors = true;
     } else {
-        // Check if due date is in the past
+        // Check if due date is at least 5 minutes in the future
         const selectedDate = new Date(assignmentData.due_date);
         const now = new Date();
-        if (selectedDate <= now) {
-            showFieldError('due-date', 'The due date must be in the future. Please select a later date and time.');
+        const fiveMinutesFromNow = new Date(now.getTime() + (5 * 60 * 1000));
+        if (selectedDate < fiveMinutesFromNow) {
+            showFieldError('due-date', 'The due date must be at least 5 minutes in the future. Please select a later date and time.');
             if (!hasErrors) document.getElementById('due-date').focus();
             hasErrors = true;
         }
@@ -92,6 +107,7 @@ async function handleFormSubmit(event) {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(assignmentData)
         });
         
@@ -120,7 +136,9 @@ async function handleFormSubmit(event) {
 // Function to load assignment data for editing
 async function loadAssignmentForEdit(id) {
     try {
-        const response = await fetch(`${API_BASE_URL}/assignments/${id}`);
+        const response = await fetch(`${API_BASE_URL}/assignments/${id}`, {
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error('Failed to fetch assignment');
         }
@@ -132,9 +150,23 @@ async function loadAssignmentForEdit(id) {
         document.getElementById('description').value = assignment.description || '';
         
         // Format date for datetime-local input
-        const dueDate = new Date(assignment.due_date);
-        const formattedDate = dueDate.toISOString().slice(0, 16);
-        document.getElementById('due-date').value = formattedDate;
+        // The server now sends dates in EAT format: "YYYY-MM-DD HH:MM:SS"
+        if (assignment.due_date) {
+            try {
+                const date = new Date(assignment.due_date);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                
+                // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+                const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+                document.getElementById('due-date').value = formattedDate;
+            } catch (error) {
+                console.error('Error formatting date:', error);
+            }
+        }
         
         document.getElementById('priority').value = assignment.priority;
         document.getElementById('status').value = assignment.status;
@@ -252,9 +284,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const prioritySelect = document.getElementById('priority');
     const statusSelect = document.getElementById('status');
     
-    // Set minimum date to today for due date input
-    const today = new Date().toISOString().slice(0, 16);
-    dueDateInput.min = today;
+    // Set minimum date to 5 minutes from now for due date input
+    const now = new Date();
+    const fiveMinutesFromNow = new Date(now.getTime() + (5 * 60 * 1000));
+    const year = fiveMinutesFromNow.getFullYear();
+    const month = String(fiveMinutesFromNow.getMonth() + 1).padStart(2, '0');
+    const day = String(fiveMinutesFromNow.getDate()).padStart(2, '0');
+    const hours = String(fiveMinutesFromNow.getHours()).padStart(2, '0');
+    const minutes = String(fiveMinutesFromNow.getMinutes()).padStart(2, '0');
+    const minDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+    dueDateInput.min = minDate;
     
     // Real-time validation feedback
     titleInput.addEventListener('blur', function() {
@@ -279,8 +318,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             const selectedDate = new Date(this.value);
             const now = new Date();
-            if (selectedDate <= now) {
-                showFieldError('due-date', 'Please select a future date and time.');
+            // Allow editing assignments that are due soon (within 5 minutes) or in the future
+            const fiveMinutesFromNow = new Date(now.getTime() + (5 * 60 * 1000));
+            if (selectedDate < fiveMinutesFromNow) {
+                showFieldError('due-date', 'Please select a date at least 5 minutes in the future.');
             } else {
                 clearFieldError('due-date');
             }

@@ -33,6 +33,12 @@ header h1 {
     font-size: 2.5rem;
 }
 
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 /* Button styles */
 .btn {
     display: inline-block;
@@ -81,6 +87,15 @@ header h1 {
 
 .btn-success:hover {
     background-color: #229954;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #138496;
 }
 
 /* Table styles */
@@ -511,3 +526,64 @@ select:invalid {
 .table-error-action:hover {
     background: #2980b9;
 }
+
+/* Due Date Indicators */
+.due-overdue {
+    background-color: #ffeaea !important;
+    border-left: 4px solid #e74c3c !important;
+    animation: pulse-red 2s infinite;
+}
+
+.due-urgent {
+    background-color: #fff3cd !important;
+    border-left: 4px solid #f39c12 !important;
+    animation: pulse-orange 2s infinite;
+}
+
+.due-soon {
+    background-color: #e8f4fd !important;
+    border-left: 4px solid #3498db !important;
+}
+
+.due-completed {
+    background-color: #f0f8f0 !important;
+    border-left: 4px solid #27ae60 !important;
+    opacity: 0.7;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+@keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(243, 156, 18, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
+}
+
+/* Due date icons */
+.due-overdue td:nth-child(3),
+.due-urgent td:nth-child(3),
+.due-soon td:nth-child(3) {
+    font-weight: 600;
+}
+
+.due-overdue td:nth-child(3) {
+    color: #e74c3c;
+}
+
+.due-urgent td:nth-child(3) {
+    color: #f39c12;
+}
+
+.due-soon td:nth-child(3) {
+    color: #3498db;
+}
+
+.due-completed td:nth-child(3) {
+    color: #27ae60;
+}
+
+

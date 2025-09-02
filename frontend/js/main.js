@@ -1,18 +1,66 @@
 // API base URL - adjust this to match your Flask backend
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
 // DOM elements
 const assignmentsBody = document.getElementById('assignments-body');
 
+// Chart instances
+let statusChart, priorityChart;
+
+
+
 // Load assignments when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, notification system ready');
-    loadAssignments();
+    // Add a small delay to ensure session cookies are set
+    setTimeout(() => {
+        checkAuthentication();
+    }, 500);
+    
+    // Add logout button event listener
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+
 });
+
+
+
+// Check if user is authenticated
+async function checkAuthentication() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+            credentials: 'include',
+            method: 'GET'
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            // User is authenticated, load assignments and analytics
+            loadAssignments();
+            loadAnalytics();
+        } else {
+            // User is not authenticated, redirect to landing page
+            window.location.href = 'landing.html';
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        // If there's an error, redirect to login
+        window.location.href = 'login.html';
+    }
+}
+
+
+
+
+
+
+
+
 
 // Global error handler
 window.addEventListener('error', function(e) {
-    console.error('Global error:', e.error);
     showNotification('error', 'JavaScript Error', 'An error occurred. Please check the console for details.');
 });
 
@@ -32,7 +80,9 @@ async function loadAssignments() {
             </tr>
         `;
         
-        const response = await fetch(`${API_BASE_URL}/assignments`);
+        const response = await fetch(`${API_BASE_URL}/assignments`, {
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
@@ -79,10 +129,35 @@ function displayAssignments(assignments) {
     
     assignments.forEach(assignment => {
         const row = document.createElement('tr');
+        
+        // Check if assignment is due soon or overdue
+        const now = new Date();
+        const dueDate = new Date(assignment.due_date);
+        const timeDiff = dueDate.getTime() - now.getTime();
+        const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+        
+        let dueClass = '';
+        let dueIcon = '';
+        
+        if (assignment.status === 'completed') {
+            dueClass = 'due-completed';
+            dueIcon = '✅';
+        } else if (minutesDiff < 0) {
+            dueClass = 'due-overdue';
+            dueIcon = '⚠️';
+        } else if (minutesDiff <= 30) {
+            dueClass = 'due-urgent';
+            dueIcon = '🚨';
+        } else if (minutesDiff <= 60) {
+            dueClass = 'due-soon';
+            dueIcon = '⏰';
+        }
+        
+        row.className = dueClass;
         row.innerHTML = `
             <td>${escapeHtml(assignment.title)}</td>
             <td>${escapeHtml(assignment.description || '')}</td>
-            <td>${formatDate(assignment.due_date)}</td>
+            <td>${dueIcon} ${formatDate(assignment.due_date)}</td>
             <td><span class="priority-${assignment.priority}">${assignment.priority}</span></td>
             <td><span class="status-${assignment.status.replace(' ', '-')}">${assignment.status}</span></td>
             <td>
@@ -110,6 +185,7 @@ async function updateStatus(id, status) {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ status })
         });
         
@@ -141,7 +217,8 @@ async function deleteAssignment(id) {
     
     try {
         const response = await fetch(`${API_BASE_URL}/assignments/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
         });
         
         if (!response.ok) {
@@ -159,8 +236,27 @@ async function deleteAssignment(id) {
 
 // Utility functions
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // The server now sends dates in EAT format: "YYYY-MM-DD HH:MM:SS"
+    try {
+        // Parse the EAT datetime string
+        const date = new Date(dateString);
+        
+        // Format as MM/DD/YYYY HH:MM AM/PM (EAT format)
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        const displayMinutes = minutes.toString().padStart(2, '0');
+        
+        return `${month}/${day}/${year} ${displayHours}:${displayMinutes} ${ampm}`;
+    } catch (error) {
+        // Fallback to original format if parsing fails
+        return dateString;
+    }
 }
 
 function escapeHtml(text) {
@@ -171,7 +267,6 @@ function escapeHtml(text) {
 
 // Notification system
 function showNotification(type, title, message, duration = 5000) {
-    console.log('Showing notification:', type, title, message);
     const container = document.getElementById('notification-container');
     
     if (!container) {
@@ -227,4 +322,193 @@ function showError(message) {
     showNotification('error', 'Error', message);
 }
 
+// Handle logout
+async function handleLogout() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            showNotification('success', 'Logged out successfully');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        } else {
+            showNotification('error', 'Logout failed');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        showNotification('error', 'Logout failed');
+    }
+}
+
+// Analytics Functions
+async function loadAnalytics() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/assignments/statistics`, {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        updateAnalytics(data);
+        
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+    }
+}
+
+function updateAnalytics(data) {
+    // Update summary cards
+    document.getElementById('total-count').textContent = data.total;
+    document.getElementById('completed-count').textContent = data.completed;
+    document.getElementById('overdue-count').textContent = data.overdue;
+    document.getElementById('pending-count').textContent = data.pending + data.in_progress;
+    
+    // Update percentages
+    document.getElementById('completed-percentage').textContent = `${data.completion_rate}%`;
+    document.getElementById('overdue-percentage').textContent = `${Math.round((data.overdue / data.total * 100) || 0)}%`;
+    document.getElementById('pending-percentage').textContent = `${Math.round(((data.pending + data.in_progress) / data.total * 100) || 0)}%`;
+    
+    // Update detailed analysis
+    document.getElementById('due-today').textContent = data.due_today;
+    document.getElementById('due-week').textContent = data.due_week;
+    document.getElementById('due-next-week').textContent = data.due_next_week;
+    document.getElementById('no-due-date').textContent = data.no_due_date;
+    
+    // Update progress metrics
+    document.getElementById('completion-rate').textContent = `${data.completion_rate}%`;
+    document.getElementById('ontime-rate').textContent = `${data.ontime_rate}%`;
+    
+    // Animate progress bars
+    setTimeout(() => {
+        document.getElementById('completion-bar').style.width = `${data.completion_rate}%`;
+        document.getElementById('ontime-bar').style.width = `${data.ontime_rate}%`;
+    }, 300);
+    
+    // Update charts
+    updateCharts(data);
+}
+
+function updateCharts(data) {
+    // Status Distribution Chart
+    updateStatusChart(data);
+    
+    // Priority Breakdown Chart
+    updatePriorityChart(data);
+}
+
+function updateStatusChart(data) {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (statusChart) {
+        statusChart.destroy();
+    }
+    
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Pending', 'In Progress', 'Overdue'],
+            datasets: [{
+                data: [data.completed, data.pending, data.in_progress, data.overdue],
+                backgroundColor: [
+                    '#10b981', // Green for completed
+                    '#f59e0b', // Yellow for pending
+                    '#3b82f6', // Blue for in progress
+                    '#ef4444'  // Red for overdue
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+}
+
+function updatePriorityChart(data) {
+    const ctx = document.getElementById('priorityChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (priorityChart) {
+        priorityChart.destroy();
+    }
+    
+    priorityChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['High Priority', 'Medium Priority', 'Low Priority'],
+            datasets: [{
+                data: [data.high_priority, data.medium_priority, data.low_priority],
+                backgroundColor: [
+                    '#ef4444', // Red for high priority
+                    '#f59e0b', // Yellow for medium priority
+                    '#10b981'  // Green for low priority
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+}
 

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Deadline Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/analytics.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Assignment Analytics</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn btn-secondary">Back to Assignments</a>
+                <button id="refresh-btn" class="btn btn-primary">🔄 Refresh Data</button>
+            </div>
+        </header>
+        
+        <main class="analytics-main">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card total">
+                    <div class="card-icon">📋</div>
+                    <div class="card-content">
+                        <h3>Total Assignments</h3>
+                        <div class="card-number" id="total-count">0</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card completed">
+                    <div class="card-icon">✅</div>
+                    <div class="card-content">
+                        <h3>Completed</h3>
+                        <div class="card-number" id="completed-count">0</div>
+                        <div class="card-percentage" id="completed-percentage">0%</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card overdue">
+                    <div class="card-icon">⚠️</div>
+                    <div class="card-content">
+                        <h3>Overdue</h3>
+                        <div class="card-number" id="overdue-count">0</div>
+                        <div class="card-percentage" id="overdue-percentage">0%</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card pending">
+                    <div class="card-icon">⏳</div>
+                    <div class="card-content">
+                        <h3>Pending</h3>
+                        <div class="card-number" id="pending-count">0</div>
+                        <div class="card-percentage" id="pending-percentage">0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h2>📈 Assignment Status Distribution</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h2>🎯 Priority Breakdown</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Analysis -->
+            <div class="detailed-analysis">
+                <div class="analysis-card">
+                    <h2>📅 Due Date Analysis</h2>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <span class="label">Due Today:</span>
+                            <span class="value" id="due-today">0</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">Due This Week:</span>
+                            <span class="value" id="due-week">0</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">Due Next Week:</span>
+                            <span class="value" id="due-next-week">0</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">No Due Date:</span>
+                            <span class="value" id="no-due-date">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-card">
+                    <h2>🚀 Progress Insights</h2>
+                    <div class="progress-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Completion Rate</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" id="completion-bar"></div>
+                            </div>
+                            <div class="metric-value" id="completion-rate">0%</div>
+                        </div>
+                        
+                        <div class="metric">
+                            <div class="metric-label">On-Time Rate</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" id="ontime-bar"></div>
+                            </div>
+                            <div class="metric-value" id="ontime-rate">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+    
+    <script src="js/analytics.js"></script>
+</body>
+</html>
