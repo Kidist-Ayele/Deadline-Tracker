@@ -8,16 +8,31 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 
 def get_db_connection():
-    """Create a MySQL database connection"""
-    return pymysql.connect(
-        host=Config.MYSQL_HOST,
-        port=Config.MYSQL_PORT,
-        user=Config.MYSQL_USER,
-        password=Config.MYSQL_PASSWORD,
-        database=Config.MYSQL_DATABASE,
-        charset='utf8mb4',
-        cursorclass=pymysql.cursors.DictCursor
-    )
+    """Create a MySQL database connection using Railway MySQL URI"""
+    # Parse the MySQL URI from config
+    mysql_config = Config().get_mysql_config()
+    
+    if mysql_config:
+        return pymysql.connect(
+            host=mysql_config['host'],
+            port=mysql_config['port'],
+            user=mysql_config['user'],
+            password=mysql_config['password'],
+            database=mysql_config['database'],
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+    else:
+        # Fallback to environment variables if URI parsing fails
+        return pymysql.connect(
+            host=os.environ.get('MYSQL_HOST', 'localhost'),
+            port=int(os.environ.get('MYSQL_PORT', 3306)),
+            user=os.environ.get('MYSQL_USER', 'root'),
+            password=os.environ.get('MYSQL_PASSWORD', ''),
+            database=os.environ.get('MYSQL_DATABASE', 'deadline_tracker'),
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
 
 @contextmanager
 def get_db():
@@ -32,25 +47,105 @@ def init_db():
     """Initialize the database with tables"""
     with get_db() as conn:
         with conn.cursor() as cursor:
-            # Read and execute schema.sql
+            # Step 1: Create tables from schema.sql
+            print("\n🗄️  Step 1: Creating tables from schema.sql...")
             schema_path = os.path.join(os.path.dirname(__file__), '..', 'database', 'schema.sql')
+            print(f"📁 Schema file path: {schema_path}")
+            
             with open(schema_path, 'r') as f:
                 schema = f.read()
-                # Split by semicolon and execute each statement
-                statements = schema.split(';')
-                for statement in statements:
-                    statement = statement.strip()
-                    if statement and not statement.startswith('--'):
-                        try:
-                            cursor.execute(statement)
-                        except Exception as e:
-                            # Skip errors for existing indexes/constraints
-                            if any(phrase in str(e) for phrase in ['Duplicate key name', 'already exists', 'Duplicate check constraint']):
-                                print(f"Skipping existing: {statement[:50]}...")
-                                continue
-                            else:
-                                print(f"Error executing: {statement[:50]}... - {e}")
-                                raise
+                print(f"📄 Schema file content length: {len(schema)} characters")
+                
+                # Remove comments and split by CREATE TABLE
+                lines = schema.split('\n')
+                clean_lines = []
+                for line in lines:
+                    line = line.strip()
+                    if line and not line.startswith('--'):
+                        clean_lines.append(line)
+                
+                clean_schema = '\n'.join(clean_lines)
+                print(f"🧹 Clean schema length: {len(clean_schema)} characters")
+                
+                # Split by CREATE TABLE (case insensitive)
+                table_statements = []
+                current_statement = ""
+                
+                for line in clean_lines:
+                    if line.upper().startswith('CREATE TABLE'):
+                        if current_statement:
+                            table_statements.append(current_statement.strip())
+                        current_statement = line
+                    elif line:
+                        current_statement += " " + line
+                
+                if current_statement:
+                    table_statements.append(current_statement.strip())
+                
+                print(f"🔍 Found {len(table_statements)} CREATE TABLE statements")
+                
+                for i, statement in enumerate(table_statements):
+                    print(f"📝 Table Statement {i+1}: {statement[:100]}...")
+                    try:
+                        cursor.execute(statement)
+                        print(f"✅ Executed: {statement[:50]}...")
+                    except Exception as e:
+                        if 'already exists' in str(e).lower():
+                            print(f"⚠️  Table already exists: {statement[:50]}...")
+                        else:
+                            print(f"❌ Error executing: {statement[:50]}... - {e}")
+                            raise
+            
+            # Step 2: Create indexes
+            print("\n🔍 Step 2: Creating indexes...")
+            index_statements = [
+                "CREATE INDEX idx_users_email ON users(email)",
+                "CREATE INDEX idx_users_verification_token ON users(email_verification_token)",
+                "CREATE INDEX idx_users_reset_token ON users(reset_password_token)",
+                "CREATE INDEX idx_assignments_user_id ON assignments(user_id)",
+                "CREATE INDEX idx_assignments_due_date ON assignments(due_date)",
+                "CREATE INDEX idx_assignments_status ON assignments(status)",
+                "CREATE INDEX idx_assignments_notification_sent ON assignments(email_notification_sent)",
+                "CREATE INDEX idx_email_notifications_user_id ON email_notifications(user_id)",
+                "CREATE INDEX idx_email_notifications_status ON email_notifications(status)",
+                "CREATE INDEX idx_email_notifications_sent_at ON email_notifications(sent_at)"
+            ]
+            
+            for statement in index_statements:
+                try:
+                    cursor.execute(statement)
+                    print(f"✅ Executed: {statement[:50]}...")
+                except Exception as e:
+                    if any(phrase in str(e).lower() for phrase in [
+                        'duplicate key name', 'already exists', 'duplicate entry'
+                    ]):
+                        print(f"⚠️  Index already exists: {statement[:50]}...")
+                    else:
+                        print(f"❌ Error executing: {statement[:50]}... - {e}")
+                        print(f"   Continuing with next statement...")
+                        continue
+            
+            # Step 3: Add constraints
+            print("\n🔒 Step 3: Adding constraints...")
+            constraint_statements = [
+                "ALTER TABLE assignments ADD CONSTRAINT chk_priority CHECK (priority IN ('low', 'medium', 'high'))",
+                "ALTER TABLE assignments ADD CONSTRAINT chk_status CHECK (status IN ('pending', 'in-progress', 'completed'))"
+            ]
+            
+            for statement in constraint_statements:
+                try:
+                    cursor.execute(statement)
+                    print(f"✅ Executed: {statement[:50]}...")
+                except Exception as e:
+                    if any(phrase in str(e).lower() for phrase in [
+                        'already exists', 'duplicate check constraint'
+                    ]):
+                        print(f"⚠️  Constraint already exists: {statement[:50]}...")
+                    else:
+                        print(f"❌ Error executing: {statement[:50]}... - {e}")
+                        print(f"   Continuing with next statement...")
+                        continue
+            
             conn.commit()
 
 class User:

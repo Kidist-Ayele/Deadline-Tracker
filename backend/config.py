@@ -6,15 +6,34 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # MySQL Configuration
-    MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
-    MYSQL_PORT = int(os.environ.get('MYSQL_PORT') or 3306)
-    MYSQL_USER = os.environ.get('MYSQL_USER') or 'root'
-    MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or ''
-    MYSQL_DATABASE = os.environ.get('MYSQL_DATABASE') or 'deadline_tracker'
+    # MySQL Configuration - Railway MySQL
+    MYSQL_URI = os.environ.get('MYSQL_URI') or 'mysql://root:tyneagTqaGciWjfHkxNBUAIoNPeQETjk@shuttle.proxy.rlwy.net:44955/railway'
     
-    # MySQL Connection String
-    MYSQL_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
+    # Parse MySQL URI for individual components (if needed)
+    def get_mysql_config(self):
+        """Parse MySQL URI to get individual connection parameters"""
+        if self.MYSQL_URI.startswith('mysql://'):
+            # Remove mysql:// prefix
+            uri = self.MYSQL_URI[8:]
+            # Split by @ to separate credentials from host
+            credentials, host_db = uri.split('@')
+            user, password = credentials.split(':')
+            # Split host_db by / to separate host:port from database
+            host_port, database = host_db.split('/')
+            if ':' in host_port:
+                host, port = host_port.split(':')
+                port = int(port)
+            else:
+                host = host_port
+                port = 3306
+            return {
+                'host': host,
+                'port': port,
+                'user': user,
+                'password': password,
+                'database': database
+            }
+        return None
     
     # Email Configuration
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'

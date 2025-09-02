@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini API Test - Deadline Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+        }
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .response {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: rgba(46, 204, 113, 0.3); }
+        .error { background: rgba(231, 76, 60, 0.3); }
+        .info { background: rgba(52, 152, 219, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Gemini API Test</h1>
+        
+        <div class="form-group">
+            <label for="apiKey">Gemini API Key:</label>
+            <input type="text" id="apiKey" placeholder="Enter your Gemini API key here...">
+        </div>
+        
+        <div class="form-group">
+            <label for="testMessage">Test Message:</label>
+            <input type="text" id="testMessage" placeholder="Enter a test message..." value="Hello! Can you help me with my studies?">
+        </div>
+        
+        <div>
+            <button onclick="enableAPI()">🚀 Enable Gemini API</button>
+            <button onclick="testConnection()">🧪 Test Connection</button>
+            <button onclick="sendMessage()">💬 Send Message</button>
+            <button onclick="clearResponse()">🗑️ Clear</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="response" class="response" style="display: none;"></div>
+    </div>
+
+    <script src="js/gemini-config.js"></script>
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showResponse(content) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.textContent = content;
+            responseDiv.style.display = 'block';
+        }
+
+        function clearResponse() {
+            document.getElementById('response').style.display = 'none';
+            document.getElementById('status').innerHTML = '';
+        }
+
+        async function enableAPI() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                showStatus('❌ Please enter your Gemini API key', 'error');
+                return;
+            }
+            
+            try {
+                enableGeminiAPI(apiKey);
+                showStatus('✅ Gemini API enabled successfully!', 'success');
+            } catch (error) {
+                showStatus(`❌ Error enabling API: ${error.message}`, 'error');
+            }
+        }
+
+        async function testConnection() {
+            try {
+                showStatus('🧪 Testing Gemini API connection...', 'info');
+                const success = await testGeminiConnection();
+                if (success) {
+                    showStatus('✅ Gemini API connection successful!', 'success');
+                } else {
+                    showStatus('❌ Gemini API connection failed', 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('testMessage').value.trim();
+            if (!message) {
+                showStatus('❌ Please enter a test message', 'error');
+                return;
+            }
+            
+            if (!GEMINI_CONFIG.API_KEY) {
+                showStatus('❌ Please enable Gemini API first', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('💬 Sending message to Gemini...', 'info');
+                const response = await getGeminiResponse(message);
+                showResponse(response);
+                showStatus('✅ Message sent successfully!', 'success');
+            } catch (error) {
+                showStatus(`❌ Error sending message: ${error.message}`, 'error');
+                showResponse(`Error: ${error.message}`);
+            }
+        }
+
+        // Check if Gemini API is already configured
+        window.addEventListener('load', () => {
+            if (GEMINI_CONFIG.API_KEY) {
+                showStatus('✅ Gemini API already configured', 'success');
+            } else {
+                showStatus('ℹ️ Please enter your Gemini API key to get started', 'info');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -11,13 +11,13 @@ const GEMINI_CONFIG = {
     // For now, we'll use the smart response system
     USE_SMART_RESPONSES: true,
     
-    // Gemini API endpoint (when you're ready to integrate)
-    API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+    // Gemini API endpoint (latest version)
+    API_URL: 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent',
     
     // Model configuration
-    MODEL: 'gemini-pro',
+    MODEL: 'gemini-1.5-flash',
     
-    // Safety settings
+    // Safety settings (updated for latest API)
     SAFETY_SETTINGS: [
         {
             category: 'HARM_CATEGORY_HARASSMENT',
@@ -37,12 +37,14 @@ const GEMINI_CONFIG = {
         }
     ],
     
-    // Generation config
+    // Generation config (updated for latest API)
     GENERATION_CONFIG: {
         temperature: 0.7,
         topK: 40,
         topP: 0.95,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 2048,
+        candidateCount: 1,
+        stopSequences: []
     }
 };
 
@@ -57,6 +59,7 @@ async function getGeminiResponse(prompt) {
             parts: [{
                 text: `You are an AI assignment assistant helping students with their homework, projects, and studies. 
                 Provide helpful, educational, and motivating responses. Keep responses concise but informative.
+                Always respond in a friendly, encouraging tone. Use emojis and formatting to make responses engaging.
                 
                 Student question: ${prompt}`
             }]
@@ -66,6 +69,8 @@ async function getGeminiResponse(prompt) {
     };
     
     try {
+        console.log('Sending request to Gemini API:', requestBody);
+        
         const response = await fetch(`${GEMINI_CONFIG.API_URL}?key=${GEMINI_CONFIG.API_KEY}`, {
             method: 'POST',
             headers: {
@@ -74,12 +79,24 @@ async function getGeminiResponse(prompt) {
             body: JSON.stringify(requestBody)
         });
         
+        console.log('Gemini API response status:', response.status);
+        
         if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Gemini API error response:', errorText);
+            throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
         }
         
         const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
+        console.log('Gemini API response data:', data);
+        
+        if (data.candidates && data.candidates.length > 0 && 
+            data.candidates[0].content && data.candidates[0].content.parts && 
+            data.candidates[0].content.parts.length > 0) {
+            return data.candidates[0].content.parts[0].text;
+        } else {
+            throw new Error('Invalid response format from Gemini API');
+        }
         
     } catch (error) {
         console.error('Gemini API error:', error);
@@ -87,7 +104,32 @@ async function getGeminiResponse(prompt) {
     }
 }
 
+// Test Gemini API connection
+async function testGeminiConnection() {
+    if (!GEMINI_CONFIG.API_KEY) {
+        console.log('❌ Gemini API key not configured');
+        return false;
+    }
+    
+    try {
+        console.log('🧪 Testing Gemini API connection...');
+        const testResponse = await getGeminiResponse('Hello! Can you help me with my studies?');
+        console.log('✅ Gemini API test successful:', testResponse);
+        return true;
+    } catch (error) {
+        console.error('❌ Gemini API test failed:', error);
+        return false;
+    }
+}
+
+// Enable Gemini API (call this function when you have your API key)
+function enableGeminiAPI(apiKey) {
+    GEMINI_CONFIG.API_KEY = apiKey;
+    GEMINI_CONFIG.USE_SMART_RESPONSES = false;
+    console.log('🚀 Gemini API enabled with key:', apiKey.substring(0, 10) + '...');
+}
+
 // Export configuration
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { GEMINI_CONFIG, getGeminiResponse };
+    module.exports = { GEMINI_CONFIG, getGeminiResponse, testGeminiConnection, enableGeminiAPI };
 }

@@ -177,6 +177,9 @@ target/
 test_*.py
 *_test.py
 tests/
+test_railway_db.py
+setup_database.py
+test-gemini.html
 
 # Configuration files with sensitive data
 config.ini
