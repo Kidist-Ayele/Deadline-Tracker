@@ -8,10 +8,14 @@ assignments_bp = Blueprint('assignments', __name__)
 
 def require_auth():
     """Decorator to require authentication"""
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'error': 'Authentication required'}), 401
-    return user_id
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'Authentication required'}), 401
+        return user_id
+    except Exception as e:
+        print(f"❌ Authentication error: {e}")
+        return jsonify({'error': 'Authentication failed'}), 401
 
 def convert_utc_to_eat(utc_datetime_str):
     """Convert UTC datetime string to EAT datetime string"""

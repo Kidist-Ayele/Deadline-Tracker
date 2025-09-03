@@ -15,12 +15,17 @@ app.config['SECRET_KEY'] = Config.SECRET_KEY
 app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
 app.config['SESSION_COOKIE_HTTPONLY'] = False  # Allow JavaScript access for debugging
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_DOMAIN'] = '127.0.0.1'
+app.config['SESSION_COOKIE_DOMAIN'] = None  # Allow any domain
 app.config['SESSION_COOKIE_PATH'] = '/'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 
 # Initialize CORS
-CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500', 'http://127.0.0.1:5501', 'http://localhost:5501'], supports_credentials=True, allow_headers=['Content-Type'], expose_headers=['Set-Cookie'])
+CORS(app, 
+     origins=['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500', 'http://127.0.0.1:5501', 'http://localhost:5501', 'http://localhost:5502', 'http://127.0.0.1:5502', 'file://'], 
+     supports_credentials=True, 
+     allow_headers=['Content-Type', 'Authorization', 'Cookie'], 
+     expose_headers=['Set-Cookie'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 
 # Initialize database
 init_db()
@@ -44,6 +49,27 @@ def health_check():
         'status': 'healthy',
         'message': 'Deadline Tracker API is running',
         'version': '1.0.0'
+    }), 200
+
+@app.route('/api/session-test', methods=['GET'])
+def session_test():
+    """Test session functionality"""
+    from flask import session, request
+    
+    # Debug: Print request info
+    print(f"🔍 Session test - Request cookies: {request.cookies}")
+    print(f"🔍 Session test - Session: {session}")
+    print(f"🔍 Session test - Session keys: {list(session.keys())}")
+    
+    # Set a test session value
+    session['test_value'] = 'test_session_working'
+    session.modified = True
+    
+    return jsonify({
+        'message': 'Session test',
+        'session_keys': list(session.keys()),
+        'test_value': session.get('test_value'),
+        'cookies_received': list(request.cookies.keys())
     }), 200
 
 @app.route('/api', methods=['GET'])

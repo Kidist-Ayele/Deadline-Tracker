@@ -80,6 +80,14 @@ def login():
         session['user_email'] = user['email']
         session['user_name'] = f"{user['first_name']} {user['last_name']}"
         
+        # Force session to be saved
+        session.modified = True
+        
+        # Debug: Print session info
+        print(f"🔍 Session created: {session}")
+        print(f"🔍 Session user_id: {session.get('user_id')}")
+        print(f"🔍 Session modified: {session.modified}")
+        
         response = jsonify({
             'message': 'Login successful',
             'user': {
