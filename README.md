@@ -16,9 +16,17 @@
 
 ### Landing Page
 
+<img width="1336" height="631" alt="image" src="https://github.com/user-attachments/assets/cf4a0243-d42e-489c-b50b-96532b7b810e" />
+
 ### Authentication Pages
 
+<img width="998" height="626" alt="image" src="https://github.com/user-attachments/assets/3fca741c-8f90-483f-ac63-d1363fd12029" />
+
 ### Dashboard
+
+<img width="1238" height="609" alt="image" src="https://github.com/user-attachments/assets/cf34eb98-d8b5-454d-8706-19ac65164c0d" />
+
+<img width="1280" height="605" alt="image" src="https://github.com/user-attachments/assets/94f132c9-2b90-4a6a-9f14-7665383e42a5" />
 
 ## Project Structure
 
