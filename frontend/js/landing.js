@@ -20,15 +20,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Navbar background change on scroll
     const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 100) {
-            navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-            navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-        } else {
-            navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-            navbar.style.boxShadow = 'none';
-        }
-    });
+    if (navbar) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+    }
 
     // Animate elements on scroll
     const observerOptions = {
@@ -47,12 +49,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Observe elements for animation
     const animateElements = document.querySelectorAll('.feature-card, .step, .floating-card');
-    animateElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-    });
+    if (animateElements.length > 0) {
+        animateElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    }
 
     // Hero stats counter animation
     const statNumbers = document.querySelectorAll('.stat-number');
@@ -83,16 +87,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Trigger stats animation when hero section is visible
     const heroSection = document.querySelector('.hero');
-    const heroObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                setTimeout(animateStats, 500);
-                heroObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.5 });
+    if (heroSection) {
+        const heroObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(animateStats, 500);
+                    heroObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
 
-    heroObserver.observe(heroSection);
+        heroObserver.observe(heroSection);
+    }
 
     // Parallax effect for mockups
     let ticking = false;
@@ -120,41 +126,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Interactive feature cards
     const featureCards = document.querySelectorAll('.feature-card');
-    featureCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
+    if (featureCards.length > 0) {
+        featureCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
         });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
+    }
 
     // Floating cards animation enhancement
     const floatingCards = document.querySelectorAll('.floating-card');
-    floatingCards.forEach((card, index) => {
-        card.addEventListener('mouseenter', function() {
-            this.style.animationPlayState = 'paused';
-            this.style.transform = 'scale(1.1) rotate(5deg)';
+    if (floatingCards.length > 0) {
+        floatingCards.forEach((card, index) => {
+            card.addEventListener('mouseenter', function() {
+                this.style.animationPlayState = 'paused';
+                this.style.transform = 'scale(1.1) rotate(5deg)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.animationPlayState = 'running';
+                this.style.transform = 'scale(1) scale(1)';
+            });
         });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.animationPlayState = 'running';
-            this.style.transform = 'scale(1) rotate(0deg)';
-        });
-    });
+    }
 
     // CTA button hover effects
     const ctaButtons = document.querySelectorAll('.cta .btn');
-    ctaButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-3px) scale(1.05)';
+    if (ctaButtons.length > 0) {
+        ctaButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
         });
-        
-        button.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
+    }
 
     // Smooth reveal animation for sections
     const sections = document.querySelectorAll('section');
@@ -187,34 +199,27 @@ document.addEventListener('DOMContentLoaded', function() {
         sectionVisibleObserver.observe(section);
     });
 
-    // Mobile menu toggle
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const mobileNavLinks = document.querySelector('.nav-links');
-    
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', function() {
-            mobileNavLinks.classList.toggle('nav-open');
-            this.classList.toggle('active');
-        });
-    }
+    // Mobile menu functionality can be added here in the future
 
     // Add loading animation to buttons
     const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            if (this.href && !this.href.includes('#')) {
-                // Add loading state for external links
-                const originalText = this.innerHTML;
-                this.innerHTML = '⏳ Loading...';
-                this.style.pointerEvents = 'none';
-                
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.style.pointerEvents = 'auto';
-                }, 2000);
-            }
+    if (buttons.length > 0) {
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (this.href && !this.href.includes('#')) {
+                    // Add loading state for external links
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '⏳ Loading...';
+                    this.style.pointerEvents = 'none';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.style.pointerEvents = 'auto';
+                    }, 2000);
+                }
+            });
         });
-    });
+    }
 
     // Intersection Observer for step-by-step animation
     const stepObserver = new IntersectionObserver(function(entries) {
@@ -229,30 +234,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
 
     const steps = document.querySelectorAll('.step');
-    steps.forEach(step => {
-        step.style.opacity = '0';
-        step.style.transform = 'translateY(30px) scale(0.9)';
-        step.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        stepObserver.observe(step);
-    });
-
-    // Scroll to top functionality
-    const scrollToTopBtn = document.getElementById('scroll-to-top');
-    
-    window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-            scrollToTopBtn.classList.add('visible');
-        } else {
-            scrollToTopBtn.classList.remove('visible');
-        }
-    });
-    
-    scrollToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+    if (steps.length > 0) {
+        steps.forEach(step => {
+            step.style.opacity = '0';
+            step.style.transform = 'translateY(30px) scale(0.9)';
+            step.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            stepObserver.observe(step);
         });
-    });
+    }
 
     // Add some fun interactive elements
     console.log('🚀 Deadline Tracker Landing Page Loaded!');

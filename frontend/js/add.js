@@ -1,5 +1,5 @@
-// API base URL - adjust this to match your Flask backend
-const API_BASE_URL = 'https://deadline-tracker-1-ijdo.onrender.com/api';
+// API base URL - now centralized in config.js
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 // DOM elements
 const addForm = document.getElementById('add-assignment-form');
@@ -122,14 +122,20 @@ async function handleFormSubmit(event) {
             editId ? 'Your assignment has been updated successfully!' : 'Your new assignment has been added successfully!'
         );
         
-        // Redirect back to the main page after a short delay
+        // Redirect back to the dashboard after a short delay
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'dashboard.html';
         }, 2000);
         
     } catch (error) {
         console.error('Error saving assignment:', error);
-        showNotification('error', 'Save Failed', 'Unable to save your assignment. Please check your connection and try again.');
+        
+        // Check if it's a connection error
+        if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_CLOSED')) {
+            showNotification('error', 'Connection Error', 'Backend server is currently unavailable. Please try again later.');
+        } else {
+            showNotification('error', 'Save Failed', 'Unable to save your assignment. Please check your connection and try again.');
+        }
     }
 }
 
@@ -265,8 +271,19 @@ function showError(message) {
     showNotification('error', 'Error', message);
 }
 
-// Enhanced form validation and user experience
+// Check authentication
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is authenticated
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+        console.log('❌ No user_id found, redirecting to login');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    console.log('✅ User authenticated:', userId);
+    
+    // Enhanced form validation and user experience
     // Disable browser's native validation
     const form = document.getElementById('add-assignment-form');
     form.setAttribute('novalidate', true);

@@ -632,15 +632,31 @@ class ChatBot {
     }
     
     formatTime(timestamp) {
+        // Ensure timestamp is a valid Date object
+        let date;
+        if (timestamp instanceof Date) {
+            date = timestamp;
+        } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+            date = new Date(timestamp);
+        } else {
+            // If timestamp is invalid, return current time
+            date = new Date();
+        }
+        
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            date = new Date();
+        }
+        
         const now = new Date();
-        const diff = now - timestamp;
+        const diff = now - date;
         const minutes = Math.floor(diff / 60000);
         const hours = Math.floor(diff / 3600000);
         
         if (minutes < 1) return 'Just now';
         if (minutes < 60) return `${minutes}m ago`;
         if (hours < 24) return `${hours}h ago`;
-        return timestamp.toLocaleDateString();
+        return date.toLocaleDateString();
     }
     
     scrollToBottom() {

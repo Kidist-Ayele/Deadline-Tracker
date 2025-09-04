@@ -3,211 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deadline Tracker</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/analytics.css">
-    <link rel="stylesheet" href="css/chatbot.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Deadline Tracker - Your Smart Assignment Management Solution</title>
+    <link rel="stylesheet" href="css/landing.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Deadline Tracker</h1>
-                                <div class="header-actions">
-                        <a href="add.html" class="btn btn-primary">Add New Assignment</a>
-                        <button id="logout-btn" class="btn btn-secondary">Logout</button>
-                    </div>
-        </header>
-        
-        <main>
-            <!-- Analytics Dashboard -->
-            <div class="analytics-section">
-                <!-- Summary Cards -->
-                <div class="summary-cards">
-                    <div class="summary-card total">
-                        <div class="card-icon">📋</div>
-                        <div class="card-content">
-                            <h3>Total Assignments</h3>
-                            <div class="card-number" id="total-count">0</div>
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card completed">
-                        <div class="card-icon">✅</div>
-                        <div class="card-content">
-                            <h3>Completed</h3>
-                            <div class="card-number" id="completed-count">0</div>
-                            <div class="card-percentage" id="completed-percentage">0%</div>
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card overdue">
-                        <div class="card-icon">⚠️</div>
-                        <div class="card-content">
-                            <h3>Overdue</h3>
-                            <div class="card-number" id="overdue-count">0</div>
-                            <div class="card-percentage" id="overdue-percentage">0%</div>
-                        </div>
-                    </div>
-                    
-                    <div class="summary-card pending">
-                        <div class="card-icon">⏳</div>
-                        <div class="card-content">
-                            <h3>Pending</h3>
-                            <div class="card-number" id="pending-count">0</div>
-                            <div class="card-percentage" id="pending-percentage">0%</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="chart-container">
-                        <h2>📈 Assignment Status Distribution</h2>
-                        <div class="chart-wrapper">
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h2>🎯 Priority Breakdown</h2>
-                        <div class="chart-wrapper">
-                            <canvas id="priorityChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Detailed Analysis -->
-                <div class="detailed-analysis">
-                    <div class="analysis-card">
-                        <h2>📅 Due Date Analysis</h2>
-                        <div class="analysis-grid">
-                            <div class="analysis-item">
-                                <span class="label">Due Today:</span>
-                                <span class="value" id="due-today">0</span>
-                            </div>
-                            <div class="analysis-item">
-                                <span class="label">Due This Week:</span>
-                                <span class="value" id="due-week">0</span>
-                            </div>
-                            <div class="analysis-item">
-                                <span class="label">Due Next Week:</span>
-                                <span class="value" id="due-next-week">0</span>
-                            </div>
-                            <div class="analysis-item">
-                                <span class="label">No Due Date:</span>
-                                <span class="value" id="no-due-date">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="analysis-card">
-                        <h2>🚀 Progress Insights</h2>
-                        <div class="progress-metrics">
-                            <div class="metric">
-                                <div class="metric-label">Completion Rate</div>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" id="completion-bar"></div>
-                                </div>
-                                <div class="metric-value" id="completion-rate">0%</div>
-                            </div>
-                            
-                            <div class="metric">
-                                <div class="metric-label">On-Time Rate</div>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" id="ontime-bar"></div>
-                                </div>
-                                <div class="metric-value" id="ontime-rate">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">⏰</span>
+                <span class="logo-text">Deadline Tracker</span>
             </div>
-            
-            <!-- Assignments Table -->
-            <div class="table-container">
-                <h2>📋 Your Assignments</h2>
-                <table id="assignments-table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Due Date</th>
-                            <th>Priority</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="assignments-body">
-                        <!-- Data will be loaded here -->
-                    </tbody>
-                </table>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#about" class="nav-link">About</a>
             </div>
-        </main>
-    </div>
-    
-    <!-- Notification Container -->
-    <div id="notification-container" class="notification-container"></div>
-    
-    <!-- AI Chat Bot -->
-    <div class="chat-bot-container">
-        <!-- Chat Toggle Button -->
-        <div class="chat-toggle" id="chat-toggle">
-            <div class="chat-icon">🤖</div>
-            <div class="chat-label">AI Assistant</div>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline">Sign In</a>
+                <a href="signup.html" class="btn btn-primary">Get Started</a>
+            </div>
         </div>
-        
-        <!-- Chat Interface -->
-        <div class="chat-interface" id="chat-interface">
-            <div class="chat-header">
-                <div class="chat-header-info">
-                    <div class="chat-avatar">🤖</div>
-                    <div class="chat-title">
-                        <h3>Gemini AI Assistant</h3>
-                        <p>Your assignment helper & recommender</p>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Never Miss Another 
+                    <span class="gradient-text">Deadline</span>
+                </h1>
+                <p class="hero-subtitle">
+                    The intelligent assignment management system that helps students stay organized, 
+                    meet deadlines, and achieve academic success with AI-powered insights and smart notifications.
+                </p>
+                <div class="hero-actions">
+                    <a href="signup.html" class="btn btn-primary btn-large">
+                        🚀 Get Started Free
+                    </a>
+                    <a href="#demo" class="btn btn-outline btn-large">
+                        📺 Watch Demo
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Assignments</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Success Rate</div>
                     </div>
                 </div>
-                <button class="chat-close" id="chat-close">×</button>
             </div>
-            
-            <div class="chat-messages" id="chat-messages">
-                <div class="message bot-message">
-                    <div class="message-avatar">🤖</div>
-                    <div class="message-content">
-                        <div class="message-text">
-                            Hello! I'm your AI assignment assistant powered by Gemini. I can help you with:
-                            <br>• Assignment planning & organization
-                            <br>• Study strategies & time management
-                            <br>• Writing tips & research guidance
-                            <br>• Problem-solving approaches
-                            <br><br>How can I help you today?
+            <div class="hero-visual">
+                <div class="hero-image">
+                    <div class="mockup-container">
+                        <div class="mockup-header">
+                            <div class="mockup-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
                         </div>
-                        <div class="message-time">Just now</div>
+                        <div class="mockup-content">
+                            <div class="mockup-card">
+                                <div class="card-icon">📚</div>
+                                <div class="card-content">
+                                    <h4>Research Paper</h4>
+                                    <p>Due in 3 days</p>
+                                </div>
+                                <div class="card-status high">High Priority</div>
+                            </div>
+                            <div class="mockup-card">
+                                <div class="card-icon">🔬</div>
+                                <div class="card-content">
+                                    <h4>Lab Report</h4>
+                                    <p>Due tomorrow</p>
+                                </div>
+                                <div class="card-status urgent">Urgent</div>
+                            </div>
+                            <div class="mockup-card">
+                                <div class="card-icon">📝</div>
+                                <div class="card-content">
+                                    <h4>Essay Draft</h4>
+                                    <p>Due next week</p>
+                                </div>
+                                <div class="card-status medium">Medium</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="chat-input-container">
-                <div class="chat-input-wrapper">
-                    <input type="text" id="chat-input" placeholder="Ask me anything about your assignments..." />
-                    <button id="chat-send" class="chat-send-btn">
-                        <span>📤</span>
-                    </button>
-                </div>
-                <div class="chat-suggestions">
-                    <button class="suggestion-btn" data-suggestion="How can I better organize my assignments?">📋 Organization Tips</button>
-                    <button class="suggestion-btn" data-suggestion="What's the best way to study for multiple deadlines?">⏰ Time Management</button>
-                    <button class="suggestion-btn" data-suggestion="How do I stay motivated with long-term projects?">🚀 Motivation</button>
-                    <button class="suggestion-btn" data-suggestion="Explain photosynthesis in biology">🔬 Science Help</button>
-                    <button class="suggestion-btn" data-suggestion="Solve this math problem: 2x + 5 = 13">🔢 Math Help</button>
-                    <button class="suggestion-btn" data-suggestion="What is the Industrial Revolution?">📚 History Help</button>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <script src="js/main.js"></script>
-    <script src="js/gemini-config.js"></script>
-    <script src="js/chatbot.js"></script>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose Deadline Tracker?</h2>
+                <p>Everything you need to stay organized and succeed in your academic journey</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered Assistant</h3>
+                    <p>Get personalized study tips, assignment help, and motivation from our intelligent AI chatbot powered by Gemini.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Smart Analytics</h3>
+                    <p>Visualize your progress with interactive charts, completion rates, and performance insights to track your growth.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3>Smart Notifications</h3>
+                    <p>Never miss deadlines with intelligent reminders, email notifications, and customizable alert settings.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Cross-Platform</h3>
+                    <p>Access your assignments from anywhere - desktop, tablet, or mobile with our responsive design.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is protected with industry-standard security and privacy measures.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Easy to Use</h3>
+                    <p>Intuitive interface designed for students - no learning curve, just productivity from day one.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Get started in minutes with our simple 3-step process</p>
+            </div>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">👤</div>
+                    <h3>Create Account</h3>
+                    <p>Sign up with your email and create your student profile in seconds.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">📝</div>
+                    <h3>Add Assignments</h3>
+                    <p>Input your assignments with due dates, priorities, and descriptions.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🎯</div>
+                    <h3>Stay Organized</h3>
+                    <p>Track progress, get reminders, and achieve your academic goals.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo">
+        <div class="container">
+            <div class="demo-content">
+                <div class="demo-text">
+                    <h2>See It in Action</h2>
+                    <p>Watch how Deadline Tracker transforms your assignment management experience with its intuitive interface and powerful features.</p>
+                    <div class="demo-features">
+                        <div class="demo-feature">
+                            <span class="check">✓</span>
+                            <span>Smart deadline tracking</span>
+                        </div>
+                        <div class="demo-feature">
+                            <span class="check">✓</span>
+                            <span>AI-powered assistance</span>
+                        </div>
+                        <div class="demo-feature">
+                            <span class="check">✓</span>
+                            <span>Progress analytics</span>
+                        </div>
+                    </div>
+                    <a href="signup.html" class="btn btn-primary btn-large">Try It Free</a>
+                </div>
+                <div class="demo-visual">
+                    <div class="demo-image">
+                        <div class="floating-card card-1">
+                            <div class="card-icon">📊</div>
+                            <div class="card-text">Analytics Overview</div>
+                        </div>
+                        <div class="floating-card card-2">
+                            <div class="card-icon">📋</div>
+                            <div class="card-text">Assignment List</div>
+                        </div>
+                        <div class="floating-card card-3">
+                            <div class="card-icon">🤖</div>
+                            <div class="card-text">AI Chat Support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Built for Students, by Students</h2>
+                    <p>
+                        Deadline Tracker was created with one simple goal: to help students manage their academic workload 
+                        more effectively. We understand the challenges of juggling multiple assignments, projects, and deadlines.
+                    </p>
+                    <p>
+                        Our platform combines modern technology with proven study strategies to give you the tools you need 
+                        to succeed. Whether you're in high school, college, or pursuing advanced studies, Deadline Tracker 
+                        adapts to your needs.
+                    </p>
+                    <div class="about-stats">
+                        <div class="about-stat">
+                            <div class="stat-value">24/7</div>
+                            <div class="stat-label">AI Support</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="stat-value">100%</div>
+                            <div class="stat-label">Free to Start</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="stat-value">Instant</div>
+                            <div class="stat-label">Setup</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="about-image">
+                        <div class="floating-card card-1">
+                            <div class="card-icon">🎓</div>
+                            <div class="card-text">Academic Success</div>
+                        </div>
+                        <div class="floating-card card-2">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-text">Productivity Boost</div>
+                        </div>
+                        <div class="floating-card card-3">
+                            <div class="card-icon">🧠</div>
+                            <div class="card-text">Smart Learning</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Academic Life?</h2>
+                <p>Join thousands of students who are already achieving more with Deadline Tracker</p>
+                <div class="cta-actions">
+                    <a href="signup.html" class="btn btn-primary btn-large">🚀 Start Free Today</a>
+                    <a href="login.html" class="btn btn-outline btn-large">Already have an account? Sign In</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-icon">⏰</span>
+                        <span class="logo-text">Deadline Tracker</span>
+                    </div>
+                    <p>Your intelligent assignment management companion for academic success.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#demo">Demo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="login.html">Sign In</a></li>
+                        <li><a href="signup.html">Get Started</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">📧</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">📘</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Deadline Tracker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/landing.js"></script>
 </body>
 </html>

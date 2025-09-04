@@ -209,6 +209,39 @@ td:last-child {
     text-align: center;
 }
 
+/* Overdue row styling */
+.overdue-row {
+    background-color: #fff5f5 !important;
+    border-left: 4px solid #e74c3c;
+}
+
+.overdue-row:hover {
+    background-color: #ffeaea !important;
+}
+
+.overdue-row td {
+    color: #c0392b;
+}
+
+/* Completed badge for completed assignments */
+.completed-badge {
+    background-color: #27ae60;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+/* Overdue date styling */
+.overdue {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
 /* Form styles */
 .form {
     background-color: white;

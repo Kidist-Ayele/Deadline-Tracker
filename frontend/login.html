@@ -6,16 +6,17 @@
     <title>Login - Deadline Tracker</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
                 <div class="back-link">
-                    <a href="landing.html">← Back to Home</a>
+                    <a href="index.html">← Back to Home</a>
                 </div>
                 <h1>Deadline Tracker</h1>
-                <p>Manage your assignments and deadlines efficiently</p>
+                <p>Sign in to manage your assignments and deadlines</p>
             </div>
 
             <!-- Login Form -->
@@ -24,15 +25,15 @@
                 <p class="auth-subtitle">Sign in to your account</p>
                 
                 <div class="form-group">
-                    <label for="login-email">Email Address</label>
-                    <input type="email" id="login-email" name="email" autocomplete="email" required>
-                    <div class="error-message" id="login-email-error"></div>
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" autocomplete="email" required>
+                    <div class="error-message" id="email-error"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" name="password" autocomplete="current-password" required>
-                    <div class="error-message" id="login-password-error"></div>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" required>
+                    <div class="error-message" id="password-error"></div>
                 </div>
                 
                 <div class="form-group">
@@ -41,54 +42,7 @@
                 
                 <div class="auth-links">
                     <a href="#" id="forgot-password-link">Forgot Password?</a>
-                    <a href="#" id="show-register-link">Don't have an account? Sign up</a>
-                </div>
-            </form>
-
-            <!-- Registration Form -->
-            <form id="register-form" class="auth-form" style="display: none;">
-                <h2>Create Account</h2>
-                <p class="auth-subtitle">Join us to start managing your deadlines</p>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="register-first-name">First Name</label>
-                        <input type="text" id="register-first-name" name="first_name" autocomplete="given-name" required>
-                        <div class="error-message" id="register-first-name-error"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="register-last-name">Last Name</label>
-                        <input type="text" id="register-last-name" name="last_name" autocomplete="family-name" required>
-                        <div class="error-message" id="register-last-name-error"></div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="register-email">Email Address</label>
-                    <input type="email" id="register-email" name="email" autocomplete="email" required>
-                    <div class="error-message" id="register-email-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="register-password">Password</label>
-                    <input type="password" id="register-password" name="password" autocomplete="new-password" required>
-                    <div class="error-message" id="register-password-error"></div>
-                    <small class="form-help">Password must be at least 8 characters long</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="register-confirm-password">Confirm Password</label>
-                    <input type="password" id="register-confirm-password" name="confirm_password" autocomplete="new-password" required>
-                    <div class="error-message" id="register-confirm-password-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-                </div>
-                
-                <div class="auth-links">
-                    <a href="#" id="show-login-link">Already have an account? Sign in</a>
+                    <a href="signup.html">Don't have an account? Sign up</a>
                 </div>
             </form>
 
@@ -108,7 +62,7 @@
                 </div>
                 
                 <div class="auth-links">
-                    <a href="#" id="back-to-login-link">Back to Sign In</a>
+                    <a href="#" id="back-to-login-link">← Back to Login</a>
                 </div>
             </form>
         </div>
@@ -117,6 +71,7 @@
     <!-- Notification Container -->
     <div id="notification-container" class="notification-container"></div>
 
-    <script src="js/auth.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>
