@@ -1,6 +1,6 @@
 # Deadline Tracker
 
-A full-stack web application for managing assignments and deadlines with a clean, modern interface.
+> A full-stack web application for managing academic deadlines and assignments with cross-device synchronization, built with Flask backend and modern frontend technologies.
 
 ## Features
 
@@ -10,6 +10,15 @@ A full-stack web application for managing assignments and deadlines with a clean
 - **Due Date Management**: Set and track due dates with datetime precision
 - **Responsive Design**: Works on desktop and mobile devices
 - **Real-time Updates**: Instant feedback for all operations
+- **📧 Email Notifications**: Get reminded about upcoming deadlines
+
+## Screenshots
+
+### Landing Page
+
+### Authentication Pages
+
+### Dashboard
 
 ## Project Structure
 
@@ -43,36 +52,12 @@ deadline-tracker/
 │── README.md                # Project documentation
 ```
 
-## Technology Stack
-
-### Frontend
-
-- **HTML5**: Semantic markup
-- **CSS3**: Modern styling with responsive design
-- **Vanilla JavaScript**: No frameworks, pure ES6+ JavaScript
-- **Fetch API**: For HTTP requests to backend
-
-### Backend
-
-- **Flask**: Python web framework
-- **SQLAlchemy**: ORM for database operations
-- **SQLite**: Lightweight database (can be changed to PostgreSQL/MySQL)
-- **Flask-CORS**: Cross-origin resource sharing support
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.8 or higher
-- Modern web browser
-- Git
-
 ### Installation
 
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Kidist-Ayele/Deadline-Tracker.git
    cd Deadline-Tracker
    ```
 
@@ -140,14 +125,6 @@ sqlite3 deadline_tracker.db < ../database/seed.sql
 }
 ```
 
-## Usage
-
-1. **View Assignments**: Open the main page to see all assignments in a table format
-2. **Add Assignment**: Click "Add New Assignment" to create a new assignment
-3. **Edit Assignment**: Click the "Edit" button on any assignment row
-4. **Update Status**: Click "Complete" to mark an assignment as completed
-5. **Delete Assignment**: Click "Delete" to remove an assignment
-
 ## Configuration
 
 ### Environment Variables
@@ -158,43 +135,3 @@ Create a `.env` file in the backend directory:
 SECRET_KEY=your-secret-key-here
 DATABASE_URL=sqlite:///deadline_tracker.db
 ```
-
-### Database Configuration
-
-The application uses SQLite by default. To use a different database:
-
-1. Update `DATABASE_URL` in your `.env` file
-2. Install the appropriate database driver
-3. Update `requirements.txt` if needed
-
-## Development
-
-### Adding New Features
-
-1. Create feature branch: `git checkout -b feature/new-feature`
-2. Make your changes
-3. Test thoroughly
-4. Submit pull request
-
-### Code Style
-
-- Follow PEP 8 for Python code
-- Use meaningful variable and function names
-- Add comments for complex logic
-- Keep functions small and focused
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support and questions, please open an issue in the repository.
